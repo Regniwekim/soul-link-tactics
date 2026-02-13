@@ -1,0 +1,124 @@
+[gd_scene load_steps=2 format=3 uid="uid://c7m1vj0xb5wbg"]
+
+[ext_resource type="Script" path="res://scripts/game_board.gd" id="1_h5n3k"]
+
+[node name="GameBoard" type="Node2D"]
+script = ExtResource("1_h5n3k")
+
+[node name="GridContainer" type="Node2D" parent="."]
+
+[node name="Player0" type="Node2D" parent="."]
+position = Vector2(100, 800)
+
+[node name="CommandZone" type="Node2D" parent="Player0"]
+position = Vector2(0, 100)
+
+[node name="Label" type="Label" parent="Player0/CommandZone"]
+offset_right = 200.0
+offset_bottom = 26.0
+text = "P1 Command Zone"
+horizontal_alignment = 1
+
+[node name="MemoryZone" type="Node2D" parent="Player0"]
+position = Vector2(250, 100)
+
+[node name="Label" type="Label" parent="Player0/MemoryZone"]
+offset_right = 200.0
+offset_bottom = 26.0
+text = "P1 Memory"
+horizontal_alignment = 1
+
+[node name="CoreZone" type="Node2D" parent="Player0"]
+position = Vector2(500, 100)
+
+[node name="Label" type="Label" parent="Player0/CoreZone"]
+offset_right = 200.0
+offset_bottom = 26.0
+text = "P1 Core Files"
+horizontal_alignment = 1
+
+[node name="Player1" type="Node2D" parent="."]
+position = Vector2(100, 100)
+
+[node name="CommandZone" type="Node2D" parent="Player1"]
+
+[node name="Label" type="Label" parent="Player1/CommandZone"]
+offset_right = 200.0
+offset_bottom = 26.0
+text = "P2 Command Zone"
+horizontal_alignment = 1
+
+[node name="MemoryZone" type="Node2D" parent="Player1"]
+position = Vector2(250, 0)
+
+[node name="Label" type="Label" parent="Player1/MemoryZone"]
+offset_right = 200.0
+offset_bottom = 26.0
+text = "P2 Memory"
+horizontal_alignment = 1
+
+[node name="CoreZone" type="Node2D" parent="Player1"]
+position = Vector2(500, 0)
+
+[node name="Label" type="Label" parent="Player1/CoreZone"]
+offset_right = 200.0
+offset_bottom = 26.0
+text = "P2 Core Files"
+horizontal_alignment = 1
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="PhaseLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 400.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 24
+text = "Player 1 - Recharge Phase"
+
+[node name="NextPhaseButton" type="Button" parent="UI"]
+offset_left = 20.0
+offset_top = 70.0
+offset_right = 200.0
+offset_bottom = 120.0
+text = "Next Phase"
+
+[node name="InfoPanel" type="PanelContainer" parent="UI"]
+offset_left = 1500.0
+offset_top = 20.0
+offset_right = 1900.0
+offset_bottom = 400.0
+
+[node name="VBox" type="VBoxContainer" parent="UI/InfoPanel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="UI/InfoPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Game Info"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UI/InfoPanel/VBox"]
+layout_mode = 2
+
+[node name="Instructions" type="RichTextLabel" parent="UI/InfoPanel/VBox"]
+custom_minimum_size = Vector2(380, 300)
+layout_mode = 2
+bbcode_enabled = true
+text = "[b]Controls:[/b]
+• Click slots to inspect
+• Click \"Next Phase\" to advance
+
+[b]Current Features:[/b]
+• 3x3 Grid for each player
+• Test units (front-left P1, front-center P2)
+• Turn phases
+• Basic combat system
+
+[b]Next Phase Info:[/b]
+[color=gray]RECHARGE[/color] - Refresh units
+[color=gray]DRAW[/color] - Draw cards (TODO)
+[color=gray]MEMORY[/color] - Place memory (TODO)
+[color=gray]MAIN[/color] - Play cards (TODO)
+[color=yellow]BATTLE[/color] - Units attack!
+[color=gray]END[/color] - Turn ends"

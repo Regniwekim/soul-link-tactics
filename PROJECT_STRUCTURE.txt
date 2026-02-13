@@ -1,0 +1,57 @@
+# Soul-Link Tactics - Project Structure
+
+This document provides a complete overview of the repository structure.
+
+```
+soul-link-tactics/
+│
+├── .github/                          # GitHub-specific files
+│   ├── ISSUE_TEMPLATE/              # Issue templates
+│   │   ├── bug_report.md            # Bug report template
+│   │   └── feature_request.md       # Feature request template
+│   ├── workflows/                   # GitHub Actions CI/CD
+│   │   └── godot-ci.yml            # Automated testing workflow
+│   └── pull_request_template.md     # PR template
+│
+├── assets/                           # Game assets
+│   ├── icons/                       # Card artwork and icons (empty - ready for assets)
+│   └── README.md                    # Asset guidelines
+│
+├── docs/                             # Documentation
+│   ├── GDD.txt                      # Game Design Document
+│   ├── IMPLEMENTATION_GUIDE.md      # Step-by-step implementation guide
+│   └── QUICKSTART.md                # 5-minute quick start guide
+│
+├── resources/                        # Godot resources
+│   └── card_data/                   # Card definitions
+│       └── README.md                # Card creation guide
+│
+├── scenes/                           # Godot scenes
+│   └── game_board.tscn              # Main game scene
+│
+├── scripts/                          # GDScript files
+│   ├── card.gd                      # Base card class (all card types)
+│   ├── grid_slot.gd                 # Grid position management
+│   └── game_board.gd                # Main game controller
+│
+├── .gitignore                        # Git ignore rules for Godot
+├── CHANGELOG.md                      # Version history
+├── CONTRIBUTING.md                   # Contribution guidelines
+├── LICENSE                           # MIT License
+├── PROJECT_STRUCTURE.txt             # This file
+├── README.md                         # Main project README
+├── icon.svg                          # Project icon
+└── project.godot                     # Godot project file
+
+```
+
+## Key Statistics
+
+- **Total Lines of Code**: ~810 (heavily commented)
+- **Documentation Files**: 8
+- **Script Files**: 3
+- **Beginner-Friendly**: ~1:4 code-to-comment ratio
+
+---
+
+Last Updated: 2025-02-12 | Version: 0.1.0

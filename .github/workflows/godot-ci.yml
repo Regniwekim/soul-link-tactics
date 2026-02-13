@@ -1,0 +1,132 @@
+name: Godot CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Check that the project can be imported without errors
+  import-check:
+    runs-on: ubuntu-latest
+    name: Import and Parse Check
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v1
+        with:
+          version: 4.3.0
+          use-dotnet: false
+      
+      - name: Verify Project
+        run: |
+          godot --headless --import --quit || exit 0
+      
+      - name: Check for Errors
+        run: |
+          # This will fail if there are any errors in the .godot/logs folder
+          if [ -f .godot/logs/godot.log ]; then
+            if grep -i "error" .godot/logs/godot.log; then
+              echo "Errors found in import!"
+              cat .godot/logs/godot.log
+              exit 1
+            fi
+          fi
+          echo "No import errors found!"
+
+  # Lint GDScript files
+  gdscript-lint:
+    runs-on: ubuntu-latest
+    name: GDScript Linting
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v1
+        with:
+          version: 4.3.0
+          use-dotnet: false
+      
+      - name: Lint GDScript
+        run: |
+          # Parse all .gd files for syntax errors
+          find . -name "*.gd" -type f -print0 | while IFS= read -r -d '' file; do
+            echo "Checking $file..."
+            godot --headless --check-only --script "$file" || exit 1
+          done
+
+  # Check documentation
+  docs-check:
+    runs-on: ubuntu-latest
+    name: Documentation Check
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Check Required Files
+        run: |
+          # Ensure all required documentation exists
+          files=(
+            "README.md"
+            "CONTRIBUTING.md"
+            "CHANGELOG.md"
+            "LICENSE"
+            "docs/GDD.txt"
+            "docs/IMPLEMENTATION_GUIDE.md"
+            "docs/QUICKSTART.md"
+          )
+          
+          missing=0
+          for file in "${files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Missing required file: $file"
+              missing=1
+            fi
+          done
+          
+          if [ $missing -eq 1 ]; then
+            exit 1
+          fi
+          
+          echo "All required documentation files present!"
+      
+      - name: Check for TODO Markers
+        run: |
+          # List all TODO comments (informational only, doesn't fail)
+          echo "Scanning for TODO items..."
+          grep -r "TODO" --include="*.gd" --include="*.md" . || echo "No TODOs found"
+
+  # Optional: Build for export (when export templates are configured)
+  # Uncomment when ready to add builds
+  # build:
+  #   runs-on: ubuntu-latest
+  #   name: Build Exports
+  #   
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     
+  #     - name: Setup Godot
+  #       uses: chickensoft-games/setup-godot@v1
+  #       with:
+  #         version: 4.3.0
+  #         use-dotnet: false
+  #     
+  #     - name: Build
+  #       run: |
+  #         mkdir -p builds
+  #         godot --headless --export-release "Linux/X11" builds/soul-link-tactics-linux.x86_64
+  #         godot --headless --export-release "Windows Desktop" builds/soul-link-tactics-windows.exe
+  #     
+  #     - name: Upload Artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: builds
+  #         path: builds/

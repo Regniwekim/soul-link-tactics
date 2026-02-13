@@ -1,0 +1,141 @@
+Game Design Document: Soul-Link Tactics (Working Title)
+
+Genre: Tactical Monster Battler TCG
+Inspiration: Magic: The Gathering (Commander), Star Wars Unlimited, Gundam TCG, Pixel Tactics, PokÃ©mon.
+
+1. Core Concept & Theme
+
+Setting: A near-future digital world where "Linkers" (human players) synchronize with "Anima" (digital monsters) to compete in a holographic 3x3 combat grid.
+The "Commander" Hook: Players choose a Linker card that stays off-field. The Linker determines the deckâ€™s color identity, provides passive buffs, holds Trap cards, and builds energy for a game-changing "Ultimate Move."
+
+2. The 8 Factions (Systems)
+
+To ensure accessibility, the game uses the Wong/Okabe-Ito Palette for color-blind friendliness. Each system maps to specific elemental types.
+
+Color	System Name	Types Included	Core Playstyle
+Vermilion	INFERNO	Fire / Dragon	Boss Monsters, High Damage, Overwhelming Force.
+Dark Blue	FLOW	Water / Fighting	Combo, Fluid Movement, Counter-attacks.
+Sky Blue	AERO	Flying / Ice	Evasion, Freezing, Back-row disruption.
+Yellow	SPARK	Electric / Steel	Energy Generation, Armor, Defense.
+Teal	HELIX	Grass / Bug / Poison	Swarm, Rapid Evolution, Passive Damage (Poison).
+Orange	TERRA	Ground / Rock	Lane Control, Wall Building, High HP.
+Magenta	PSY	Psychic / Fairy	Rule-bending, Mind Control, Trap-heavy.
+Charcoal	VOID	Ghost / Dark	Graveyard Recursion, Sacrifice, Debuffs.
+3. Card Types
+
+Linker (The Commander): Starts in the Command Zone. Sets deck colors. Has a Life total (Core Files) and Trap Slots.
+
+Unit: The monsters deployed to the 3x3 Grid. Have Power (ATK/DEF) and Stage (Level).
+
+Install (Equipment): Placed under a Unit. Limit: 1 per Unit. Provides stat boosts or keywords.
+
+Firewall (Base): Structures placed behind a column. Absorbs damage for that lane and provides a "Lane Buff" to allies in that column.
+
+Item (Spell): Single-use cards that provide immediate effects.
+
+Trap: Played face-down in a Linkerâ€™s Trap Slot for 2 Memory. Activated by a trigger and a "Trigger Cost."
+
+4. The Game Board
+
+The Grid: A 3x3 area (Front, Middle, and Back rows across three columns).
+
+The Command Zone: Houses the Linker and their face-down Trap cards.
+
+The Core: A stack of 5 face-down cards (HP) known as Core Files.
+
+Memory Zone: Face-down cards used as resources.
+
+5. Game Rules & Turn Structure
+Setup
+
+Place Linker in Command Zone.
+
+Shuffle deck; draw hand (e.g., 6 cards).
+
+Place the top 5 cards of the deck face-down as Core Files.
+
+Turn Phases
+
+Recharge Phase: Ready all exhausted Units and Memory.
+
+Draw Phase: Draw 2 cards.
+
+Memory Phase: You may place 1 card from your hand face-down into the Memory Zone.
+
+Main Phase: (Alternating Actions) Players pay Memory to:
+
+Deploy Units to the Grid.
+
+Evolve Units (Heals damage, removes summoning sickness, triggers [On Play] effects).
+
+Attach Installs.
+
+Build Firewalls.
+
+Play Items.
+
+Set Traps: Pay 2 Memory to place a Trap face-down in an available Linker slot.
+
+Battle Phase:
+
+Units attack in linear columns.
+
+Melee (Front Row): Hits the first enemy in column.
+
+Ranged (Any Row): Hits the first enemy in column.
+
+Flyer (Any Row): Can target any unit in the column, but cannot hit Firewalls/Core if the column has units.
+
+Sniper (Back Row): Can target any unit in the column.
+
+End Phase: "End of turn" effects expire.
+
+6. Combat & Damage
+
+Unit vs. Unit: Damage is simultaneous and persistent. Use counters to track remaining HP.
+
+Empty Column Attack: If an attacker targets a column with no Units:
+
+Damage is dealt to the Firewall (Base) if present.
+
+If no Firewall exists, 1 Core File is revealed.
+
+If the revealed Core File has a [BURST] effect, it triggers for free.
+
+The revealed card is added to the defender's hand.
+
+Defeat: A player loses when they take damage while having 0 Core Files.
+
+7. The Linker System
+
+Deckbuilding: Your deck can only contain cards matching your Linkerâ€™s color(s).
+
+Sync Gauge: Every Linker has a unique condition to gain "Sync Points" (e.g., "Gain 1 Sync when you Evolve").
+
+Sync Override (Ultimate): Spend accumulated Sync Points to trigger a powerful ability at any time.
+
+Trap Management: The Linker card dictates how many Traps you can have "Set" at once.
+
+8. Keywords
+
+[On Play / On Evo]: Triggers when the card enters the grid or is evolved onto.
+
+[Burst]: An effect that triggers only when revealed from the Core Files (HP).
+
+[Blocker]: Prevents enemies from attacking units behind this card.
+
+[Blitz]: This unit may attack or use abilities the turn it is played.
+
+[Piercing]: If this unit destroys a defender, excess damage hits the unit behind it.
+
+[Stealth]: This unit cannot be targeted by Items or enemy abilities while in the Back Row.
+
+9. Design Philosophy
+
+Streamlined: Alternating actions and "any card is a resource" reduces downtime and "mana screw."
+
+Tactical: Positioning on the 3x3 grid is as important as the cards themselves.
+
+Anime Flair: Evolution and Ultimate Moves create high-impact "Hero Moments."
+
+Accessibility: High-contrast colors and distinct icons for all factions.
