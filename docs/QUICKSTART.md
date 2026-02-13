@@ -4,7 +4,7 @@ Get Soul-Link Tactics running in under 5 minutes!
 
 ## Prerequisites
 
-1. **Download Godot Engine 4.3 or later**
+1. **Download Godot Engine 4.6 or later**
    - Go to https://godotengine.org/download
    - Download the Standard version (not .NET unless you need C#)
    - Extract and run

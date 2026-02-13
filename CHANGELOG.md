@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-02-12
 
 ### Added
-- Initial project setup with Godot 4.3+
+- Initial project setup with Godot 4.6
 - 3x3 battle grid system for both players
 - Complete card framework with all 8 systems/factions
 - Base card class with all properties from GDD

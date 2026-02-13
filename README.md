@@ -4,9 +4,9 @@
 
 ![Soul-Link Tactics](icon.svg)
 
-**A tactical monster battler card game built with Godot 4.3+**
+**A tactical monster battler card game built with Godot 4.6**
 
-[![Godot Engine](https://img.shields.io/badge/Godot-4.3+-blue.svg)](https://godotengine.org/)
+[![Godot Engine](https://img.shields.io/badge/Godot-4.6-blue.svg)](https://godotengine.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 [Features](#features) • [Getting Started](#getting-started) • [Documentation](#documentation) • [Contributing](#contributing)
@@ -56,7 +56,7 @@ Players choose a **Linker** card (similar to a Commander in MTG) that:
 
 ### Prerequisites
 
-- [Godot Engine 4.3 or later](https://godotengine.org/download)
+- [Godot Engine 4.6 or later](https://godotengine.org/download)
 
 ### Installation
 

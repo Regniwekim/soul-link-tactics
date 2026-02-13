@@ -229,7 +229,7 @@ Before submitting your PR, ensure:
 - [ ] Documentation updated if needed
 - [ ] Commit messages are clear
 - [ ] PR description explains what and why
-- [ ] Tested in Godot 4.3+
+- [ ] Tested in Godot 4.6+
 
 ## 🏆 Recognition
 
