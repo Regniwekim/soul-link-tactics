@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Card" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/monster_sprites/Cerberus_Ptolemaios.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+card_name = "Cerberus Ptolemaios"
+systems = [Card.System.VOID]
+card_type = 0
+memory_cost = 2
+description = "A Cerberus Ptolemaios from the digital realm."
+artwork = ExtResource("2")
+power = 2
+health = 3
+current_damage = 0
+stage = 1
+attack_type = Card.AttackType.MELEE
+on_play_effect = ""
+on_evo_effect = ""
+burst_effect = ""
+has_blocker = false
+has_blitz = false
+has_piercing = false
+has_stealth = false
