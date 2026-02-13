@@ -23,6 +23,27 @@ enum Phase {
 
 var current_phase: Phase = Phase.RECHARGE
 
+## Player data structure
+class PlayerData:
+	var deck: Deck
+	var hand_ui: HandUI
+	var available_memory: int = 0
+	var memory_cards: int = 0  # Total memory cards placed
+	
+	func _init():
+		deck = Deck.new()
+
+## Player 0's data
+var player_0_data: PlayerData
+
+## Player 1's data
+var player_1_data: PlayerData
+
+# Card placement mode
+var placement_mode: bool = false
+var card_to_place: Card = null
+var card_hand_index: int = -1
+
 # ============================================================================
 # GRID STORAGE - The 3x3 battle grid for each player
 # ============================================================================
@@ -54,15 +75,27 @@ var player_1_grid: Array = []
 
 ## UI elements
 @onready var phase_label: Label = $UI/PhaseLabel
-@onready var turn_button: Button = $UI/NextPhaseButton
+@ontml:parameter name="turn_button: Button = $UI/NextPhaseButton
+@onready var p0_hand_ui: HandUI = $UI/Player0Hand
+@onready var p1_hand_ui: HandUI = $UI/Player1Hand
+@onready var p0_memory_label: Label = $UI/Player0MemoryLabel
+@onready var p1_memory_label: Label = $UI/Player1MemoryLabel
+@onready var status_label: Label = $UI/StatusLabel
 
 # ============================================================================
 # INITIALIZATION
 # ============================================================================
 
 func _ready() -> void:
+	# Initialize player data
+	player_0_data = PlayerData.new()
+	player_1_data = PlayerData.new()
+	
 	# Create the 3x3 grid for both players
 	setup_grid()
+	
+	# Setup hands
+	setup_hands()
 	
 	# Start the game
 	start_game()
@@ -121,6 +154,23 @@ func setup_grid() -> void:
 	
 	print("Grid setup complete!")
 
+## Setup hand UI and connect signals
+func setup_hands() -> void:
+	print("Setting up hands...")
+	
+	# Connect hand signals
+	p0_hand_ui.card_selected.connect(_on_card_selected.bind(0))
+	p0_hand_ui.insufficient_memory.connect(_on_insufficient_memory.bind(0))
+	
+	p1_hand_ui.card_selected.connect(_on_card_selected.bind(1))
+	p1_hand_ui.insufficient_memory.connect(_on_insufficient_memory.bind(1))
+	
+	# Store hand references
+	player_0_data.hand_ui = p0_hand_ui
+	player_1_data.hand_ui = p1_hand_ui
+	
+	print("Hands setup complete!")
+
 ## Factory function to create a grid slot with all necessary components
 func create_grid_slot(col: int, row: int, player_owner: int) -> GridSlot:
 	# Create the slot node
@@ -172,11 +222,24 @@ func start_game() -> void:
 	print("Starting Soul-Link Tactics!")
 	current_player = 0
 	current_phase = Phase.RECHARGE
-	update_ui()
 	
-	# TODO: Initialize decks, draw starting hands, set up Core Files
-	# For now, we'll create some test units
-	create_test_units()
+	# Create test decks for both players
+	create_test_decks()
+	
+	# Draw starting hands (5 cards each)
+	for i in range(5):
+		player_0_data.hand_ui.add_card(player_0_data.deck.draw_card())
+		player_1_data.hand_ui.add_card(player_1_data.deck.draw_card())
+	
+	# Give starting memory
+	player_0_data.memory_cards = 3
+	player_0_data.available_memory = 3
+	
+	player_1_data.memory_cards = 3
+	player_1_data.available_memory = 3
+	
+	update_ui()
+	print("Game started! Draw 2 cards and play!")
 
 ## Progress to the next phase or next turn
 func next_phase() -> void:
@@ -214,17 +277,31 @@ func phase_recharge() -> void:
 	print("Recharge Phase - Player %d" % current_player)
 	
 	var grid = get_current_player_grid()
+	var player_data = get_current_player_data()
 	
 	# Refresh all units
 	for column in grid:
 		for slot in column:
 			slot.refresh()
+	
+	# Refresh memory
+	player_data.available_memory = player_data.memory_cards
+	print("Memory refreshed: %d/%d" % [player_data.available_memory, player_data.memory_cards])
 
 ## DRAW PHASE: Draw cards
 func phase_draw() -> void:
 	print("Draw Phase - Player %d" % current_player)
-	# TODO: Implement drawing from deck
-	# For now, just announce the phase
+	
+	var player_data = get_current_player_data()
+	
+	# Draw 2 cards
+	for i in range(2):
+		var card = player_data.deck.draw_card()
+		if card:
+			player_data.hand_ui.add_card(card)
+			print("Drew: %s" % card.card_name)
+		else:
+			print("Deck is empty!")
 
 ## BATTLE PHASE: Process attacks
 func phase_battle() -> void:
@@ -325,6 +402,20 @@ func get_slot(player: int, column: int, row: int) -> GridSlot:
 	else:
 		return player_1_grid[column][row]
 
+## Get current player's data
+func get_current_player_data() -> PlayerData:
+	if current_player == 0:
+		return player_0_data
+	else:
+		return player_1_data
+
+## Get opponent's data
+func get_opponent_data() -> PlayerData:
+	if current_player == 0:
+		return player_1_data
+	else:
+		return player_0_data
+
 # ============================================================================
 # UI UPDATES
 # ============================================================================
@@ -332,6 +423,24 @@ func get_slot(player: int, column: int, row: int) -> GridSlot:
 func update_ui() -> void:
 	var phase_name = Phase.keys()[current_phase]
 	phase_label.text = "Player %d - %s Phase" % [current_player + 1, phase_name]
+	
+	# Update memory labels
+	p0_memory_label.text = "P1 Memory: %d/%d" % [player_0_data.available_memory, player_0_data.memory_cards]
+	p1_memory_label.text = "P2 Memory: %d/%d" % [player_1_data.available_memory, player_1_data.memory_cards]
+	
+	# Update hand memory displays
+	p0_hand_ui.set_available_memory(player_0_data.available_memory)
+	p1_hand_ui.set_available_memory(player_1_data.available_memory)
+	
+	# Show/hide hands based on current player
+	p0_hand_ui.visible = (current_player == 0)
+	p1_hand_ui.visible = (current_player == 1)
+	
+	# Update status
+	if placement_mode and card_to_place:
+		status_label.text = "Click a slot to place: %s" % card_to_place.card_name
+	else:
+		status_label.text = "Select a card from your hand to play"
 
 # ============================================================================
 # INPUT HANDLERS
@@ -340,43 +449,143 @@ func update_ui() -> void:
 func _on_next_phase_button_pressed() -> void:
 	next_phase()
 
+## Called when a card is selected from hand
+func _on_card_selected(card: Card, hand_index: int, player: int) -> void:
+	if player != current_player:
+		return
+	
+	if card == null:
+		# Deselected
+		placement_mode = false
+		card_to_place = null
+		card_hand_index = -1
+		status_label.text = "Card deselected"
+	else:
+		# Selected a card
+		placement_mode = true
+		card_to_place = card
+		card_hand_index = hand_index
+		status_label.text = "Click a slot to place: %s (Cost: %d)" % [card.card_name, card.memory_cost]
+	
+	update_ui()
+
+## Called when trying to select a card that's too expensive
+func _on_insufficient_memory(card: Card, cost: int, available: int, player: int) -> void:
+	if player != current_player:
+		return
+	
+	status_label.text = "Not enough memory! Need %d, have %d" % [cost, available]
+	print("Cannot afford %s - Need %d memory, have %d" % [card.card_name, cost, available])
+
 func _on_slot_clicked(slot: GridSlot) -> void:
 	print("Slot clicked: Column %d, Row %d, Owner %d" % [slot.column, slot.row, slot.owner_id])
+	
+	# Only allow interaction on your own grid during MAIN phase
+	if current_phase != Phase.MAIN:
+		print("Can only play cards during MAIN phase!")
+		return
+	
+	if slot.owner_id != current_player:
+		print("That's not your grid!")
+		return
+	
+	# If we're in placement mode, try to place the card
+	if placement_mode and card_to_place:
+		if place_card_on_slot(slot):
+			# Successfully placed - exit placement mode
+			placement_mode = false
+			card_to_place = null
+			card_hand_index = -1
+			get_current_player_data().hand_ui.clear_selection()
+		update_ui()
+	else:
+		# Just inspecting a slot
+		if slot.is_occupied():
+			print("  Unit: %s (%d/%d)" % [slot.unit_card.card_name, 
+										   slot.get_total_power(), 
+										   slot.unit_card.get_current_health()])
+
+## Try to place a card on a slot
+func place_card_on_slot(slot: GridSlot) -> bool:
+	if not card_to_place:
+		return false
+	
+	# Check if slot is empty
 	if slot.is_occupied():
-		print("  Unit: %s (%d/%d)" % [slot.unit_card.card_name, 
-									   slot.get_total_power(), 
-									   slot.unit_card.get_current_health()])
+		print("Slot already occupied!")
+		status_label.text = "Slot already occupied!"
+		return false
+	
+	var player_data = get_current_player_data()
+	
+	# Check if we can afford it
+	if player_data.available_memory < card_to_place.memory_cost:
+		print("Not enough memory!")
+		status_label.text = "Not enough memory! Need %d, have %d" % [card_to_place.memory_cost, player_data.available_memory]
+		return false
+	
+	# Place the card
+	if slot.place_unit(card_to_place):
+		# Pay the cost
+		player_data.available_memory -= card_to_place.memory_cost
+		
+		# Remove from hand
+		player_data.hand_ui.remove_card(card_hand_index)
+		
+		print("Placed %s! Memory: %d/%d" % [card_to_place.card_name, player_data.available_memory, player_data.memory_cards])
+		status_label.text = "Placed %s!" % card_to_place.card_name
+		
+		update_ui()
+		return true
+	
+	return false
 
 # ============================================================================
 # TEST / DEBUG FUNCTIONS
 # ============================================================================
 
-## Create some test units to demonstrate the system
-func create_test_units() -> void:
-	print("Creating test units...")
+## Create test decks for both players
+func create_test_decks() -> void:
+	print("Creating test decks...")
 	
-	# Create a test INFERNO unit for Player 0
-	var test_unit_1 = Card.new()
-	test_unit_1.card_name = "Flame Drake"
-	test_unit_1.card_type = Card.CardType.UNIT
-	test_unit_1.systems = [Card.System.INFERNO]
-	test_unit_1.power = 3
-	test_unit_1.health = 4
-	test_unit_1.attack_type = Card.AttackType.MELEE
+	# Create a variety of test cards
+	var test_cards_p0 = []
+	var test_cards_p1 = []
 	
-	# Place it in front-left slot
-	player_0_grid[0][0].place_unit(test_unit_1)
+	# Player 0 - INFERNO themed deck
+	for i in range(10):
+		var card = Card.new()
+		card.card_name = "Fire Unit %d" % (i + 1)
+		card.card_type = Card.CardType.UNIT
+		card.systems = [Card.System.INFERNO]
+		card.stage = 1 if i < 6 else 2
+		card.memory_cost = 1 if i < 4 else (2 if i < 8 else 3)
+		card.power = 1 + (i % 3)
+		card.health = 2 + (i % 3)
+		card.attack_type = Card.AttackType.MELEE
+		test_cards_p0.append(card)
 	
-	# Create a test FLOW unit for Player 1
-	var test_unit_2 = Card.new()
-	test_unit_2.card_name = "Aqua Warrior"
-	test_unit_2.card_type = Card.CardType.UNIT
-	test_unit_2.systems = [Card.System.FLOW]
-	test_unit_2.power = 2
-	test_unit_2.health = 5
-	test_unit_2.attack_type = Card.AttackType.RANGED
+	# Player 1 - FLOW themed deck
+	for i in range(10):
+		var card = Card.new()
+		card.card_name = "Water Unit %d" % (i + 1)
+		card.card_type = Card.CardType.UNIT
+		card.systems = [Card.System.FLOW]
+		card.stage = 1 if i < 6 else 2
+		card.memory_cost = 1 if i < 4 else (2 if i < 8 else 3)
+		card.power = 1 + (i % 3)
+		card.health = 2 + (i % 3)
+		card.attack_type = Card.AttackType.RANGED if i % 2 == 0 else Card.AttackType.MELEE
+		test_cards_p1.append(card)
 	
-	# Place it in front-center slot
-	player_1_grid[1][0].place_unit(test_unit_2)
+	# Build decks
+	player_0_data.deck.build_from_cards(test_cards_p0)
+	player_0_data.deck.shuffle_deck()
 	
-	print("Test units created!")
+	player_1_data.deck.build_from_cards(test_cards_p1)
+	player_1_data.deck.shuffle_deck()
+	
+	print("Test decks created! P0: %d cards, P1: %d cards" % [
+		player_0_data.deck.get_card_count(),
+		player_1_data.deck.get_card_count()
+	])

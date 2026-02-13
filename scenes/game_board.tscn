@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://c7m1vj0xb5wbg"]
+[gd_scene load_steps=4 format=3 uid="uid://c7m1vj0xb5wbg"]
 
 [ext_resource type="Script" path="res://scripts/game_board.gd" id="1_h5n3k"]
+[ext_resource type="Script" path="res://scripts/deck.gd" id="2_deck"]
+[ext_resource type="Script" path="res://scripts/hand_ui.gd" id="3_hand"]
 
 [node name="GameBoard" type="Node2D"]
 script = ExtResource("1_h5n3k")
@@ -82,6 +84,77 @@ offset_top = 70.0
 offset_right = 200.0
 offset_bottom = 120.0
 text = "Next Phase"
+
+[node name="Player0MemoryLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 130.0
+offset_right = 200.0
+offset_bottom = 160.0
+theme_override_font_sizes/font_size = 18
+text = "P1 Memory: 0/0"
+
+[node name="Player1MemoryLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 170.0
+offset_right = 200.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 18
+text = "P2 Memory: 0/0"
+
+[node name="StatusLabel" type="Label" parent="UI"]
+offset_left = 220.0
+offset_top = 20.0
+offset_right = 800.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 20
+text = "Select a card to play"
+horizontal_alignment = 1
+
+[node name="Player0Hand" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -180.0
+offset_right = 400.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("3_hand")
+
+[node name="CardContainer" type="HBoxContainer" parent="UI/Player0Hand"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Player1Hand" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -400.0
+offset_top = 20.0
+offset_right = 400.0
+offset_bottom = 180.0
+grow_horizontal = 2
+script = ExtResource("3_hand")
+visible = false
+
+[node name="CardContainer" type="HBoxContainer" parent="UI/Player1Hand"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
 
 [node name="InfoPanel" type="PanelContainer" parent="UI"]
 offset_left = 1500.0
