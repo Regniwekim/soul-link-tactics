@@ -8,6 +8,9 @@ class_name GameBoard
 # GAME STATE
 # ============================================================================
 
+## Card database - loads all cards from resources
+var card_database: CardDatabase
+
 ## Which player's turn it is (0 or 1)
 var current_player: int = 0
 
@@ -75,7 +78,7 @@ var player_1_grid: Array = []
 
 ## UI elements
 @onready var phase_label: Label = $UI/PhaseLabel
-@ontml:parameter name="turn_button: Button = $UI/NextPhaseButton
+@onready var turn_button: Button = $UI/NextPhaseButton
 @onready var p0_hand_ui: HandUI = $UI/Player0Hand
 @onready var p1_hand_ui: HandUI = $UI/Player1Hand
 @onready var p0_memory_label: Label = $UI/Player0MemoryLabel
@@ -87,6 +90,11 @@ var player_1_grid: Array = []
 # ============================================================================
 
 func _ready() -> void:
+	# Initialize card database
+	card_database = CardDatabase.new()
+	add_child(card_database)
+	card_database.load_all_cards()
+	
 	# Initialize player data
 	player_0_data = PlayerData.new()
 	player_1_data = PlayerData.new()
@@ -195,8 +203,11 @@ func create_grid_slot(col: int, row: int, player_owner: int) -> GridSlot:
 	
 	var stats_label = Label.new()
 	stats_label.name = "StatsLabel"
-	stats_label.position = Vector2(5, 110)
-	stats_label.add_theme_font_size_override("font_size", 16)
+	stats_label.position = Vector2(5, 90)
+	stats_label.size = Vector2(130, 50)
+	stats_label.add_theme_font_size_override("font_size", 12)
+	stats_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stats_label.visible = false
 	slot.add_child(stats_label)
 	
@@ -223,13 +234,22 @@ func start_game() -> void:
 	current_player = 0
 	current_phase = Phase.RECHARGE
 	
-	# Create test decks for both players
-	create_test_decks()
+	# Create decks from card database if available, otherwise use test decks
+	if card_database.has_cards():
+		create_decks_from_database()
+	else:
+		print("No cards loaded from database, using test decks...")
+		create_test_decks()
 	
 	# Draw starting hands (5 cards each)
 	for i in range(5):
-		player_0_data.hand_ui.add_card(player_0_data.deck.draw_card())
-		player_1_data.hand_ui.add_card(player_1_data.deck.draw_card())
+		var p0_card = player_0_data.deck.draw_card()
+		var p1_card = player_1_data.deck.draw_card()
+		
+		if p0_card:
+			player_0_data.hand_ui.add_card(p0_card)
+		if p1_card:
+			player_1_data.hand_ui.add_card(p1_card)
 	
 	# Give starting memory
 	player_0_data.memory_cards = 3
@@ -543,6 +563,35 @@ func place_card_on_slot(slot: GridSlot) -> bool:
 # ============================================================================
 # TEST / DEBUG FUNCTIONS
 # ============================================================================
+
+## Create decks from the loaded card database
+func create_decks_from_database() -> void:
+	print("Creating decks from card database...")
+	
+	# Print card database stats
+	card_database.print_stats()
+	
+	# Build decks using DeckConfig
+	var p0_deck_cards = DeckConfig.build_deck_for_player(0, card_database)
+	var p1_deck_cards = DeckConfig.build_deck_for_player(1, card_database)
+	
+	# Fallback to test decks if no cards loaded
+	if p0_deck_cards.is_empty() or p1_deck_cards.is_empty():
+		print("Warning: Could not build decks from database, using test decks")
+		create_test_decks()
+		return
+	
+	# Build player decks
+	player_0_data.deck.build_from_cards(p0_deck_cards)
+	player_0_data.deck.shuffle_deck()
+	
+	player_1_data.deck.build_from_cards(p1_deck_cards)
+	player_1_data.deck.shuffle_deck()
+	
+	print("\n=== Decks Ready ===")
+	print("Player 0: %s (%d cards)" % [str(DeckConfig.player_0_config["systems"]), p0_deck_cards.size()])
+	print("Player 1: %s (%d cards)" % [str(DeckConfig.player_1_config["systems"]), p1_deck_cards.size()])
+	print("===================\n")
 
 ## Create test decks for both players
 func create_test_decks() -> void:

@@ -234,7 +234,11 @@ func update_display() -> void:
 		
 		# Show power/health
 		var current_hp = unit_card.get_current_health()
-		stats_label.text = "%d / %d" % [get_total_power(), current_hp]
+		stats_label.text = "%s\n%d / %d" % [
+			unit_card.card_name,
+			get_total_power(), 
+			current_hp
+		]
 		
 		# Color based on system
 		background.color = unit_card.get_system_color()

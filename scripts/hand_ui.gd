@@ -34,39 +34,136 @@ var available_memory: int = 0
 # ============================================================================
 
 ## Visual representation of a card in hand
-class CardDisplay:
+class CardDisplay extends Control:
 	var card: Card
-	var button: Button
 	var index: int
+	
+	# Visual components
+	var card_panel: Panel
+	var artwork: TextureRect
+	var name_label: Label
+	var cost_label: Label
+	var stats_label: Label
+	var stage_label: Label
+	var click_detector: Button
 	
 	func _init(c: Card, idx: int):
 		card = c
 		index = idx
-		button = Button.new()
-		button.custom_minimum_size = Vector2(100, 140)
+		custom_minimum_size = Vector2(120, 180)
+		
+		# Create visual structure
+		create_visuals()
 		update_display()
 	
+	func create_visuals():
+		# Background panel
+		card_panel = Panel.new()
+		card_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+		add_child(card_panel)
+		
+		# Artwork
+		artwork = TextureRect.new()
+		artwork.position = Vector2(5, 25)
+		artwork.size = Vector2(110, 110)
+		artwork.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		artwork.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		add_child(artwork)
+		
+		# Card name
+		name_label = Label.new()
+		name_label.position = Vector2(5, 5)
+		name_label.size = Vector2(110, 20)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.add_theme_font_size_override("font_size", 11)
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_label.clip_text = true
+		add_child(name_label)
+		
+		# Memory cost (top-right corner)
+		cost_label = Label.new()
+		cost_label.position = Vector2(90, 5)
+		cost_label.size = Vector2(25, 20)
+		cost_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cost_label.add_theme_font_size_override("font_size", 14)
+		add_child(cost_label)
+		
+		# Stats (bottom)
+		stats_label = Label.new()
+		stats_label.position = Vector2(5, 140)
+		stats_label.size = Vector2(110, 20)
+		stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		stats_label.add_theme_font_size_override("font_size", 13)
+		add_child(stats_label)
+		
+		# Stage indicator
+		stage_label = Label.new()
+		stage_label.position = Vector2(5, 5)
+		stage_label.size = Vector2(25, 20)
+		stage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		stage_label.add_theme_font_size_override("font_size", 12)
+		add_child(stage_label)
+		
+		# Invisible button for click detection
+		click_detector = Button.new()
+		click_detector.set_anchors_preset(Control.PRESET_FULL_RECT)
+		click_detector.flat = true
+		click_detector.mouse_filter = Control.MOUSE_FILTER_PASS
+		add_child(click_detector)
+	
 	func update_display():
-		var cost_color = "white"
-		button.text = "%s\n[%d]\n%d/%d\nCost: %d" % [
-			card.card_name,
-			card.stage,
-			card.power,
-			card.health,
-			card.memory_cost
-		]
+		if not is_node_ready():
+			return
+		
+		# Set card name
+		name_label.text = card.card_name
+		
+		# Set artwork if available
+		if card.artwork:
+			artwork.texture = card.artwork
+		else:
+			# Use a colored rectangle if no artwork
+			artwork.modulate = card.get_system_color()
+		
+		# Set memory cost
+		cost_label.text = str(card.memory_cost)
+		cost_label.add_theme_color_override("font_color", Color.GOLD)
+		
+		# Set stats (Power/Health)
+		stats_label.text = "%d / %d" % [card.power, card.health]
+		
+		# Set stage
+		stage_label.text = "★%d" % card.stage
+		
+		# Set background color based on system
+		var style = StyleBoxFlat.new()
+		style.bg_color = card.get_system_color()
+		style.border_width_all = 2
+		style.border_color = Color.BLACK
+		style.corner_radius_all = 5
+		card_panel.add_theme_stylebox_override("panel", style)
 	
 	func set_affordable(can_afford: bool):
 		if can_afford:
-			button.modulate = Color.WHITE
+			modulate = Color.WHITE
 		else:
-			button.modulate = Color(0.5, 0.5, 0.5)
+			modulate = Color(0.6, 0.6, 0.6)
 	
 	func set_selected(is_selected: bool):
 		if is_selected:
-			button.add_theme_color_override("font_color", Color.YELLOW)
+			var style = StyleBoxFlat.new()
+			style.bg_color = card.get_system_color()
+			style.border_width_all = 4
+			style.border_color = Color.YELLOW
+			style.corner_radius_all = 5
+			card_panel.add_theme_stylebox_override("panel", style)
 		else:
-			button.remove_theme_color_override("font_color")
+			var style = StyleBoxFlat.new()
+			style.bg_color = card.get_system_color()
+			style.border_width_all = 2
+			style.border_color = Color.BLACK
+			style.corner_radius_all = 5
+			card_panel.add_theme_stylebox_override("panel", style)
 
 # ============================================================================
 # INITIALIZATION
@@ -144,11 +241,11 @@ func refresh_display() -> void:
 		# Set selection
 		display.set_selected(i == selected_index)
 		
-		# Connect button
-		display.button.pressed.connect(_on_card_clicked.bind(i))
+		# Connect click detector button
+		display.click_detector.pressed.connect(_on_card_clicked.bind(i))
 		
 		# Add to container
-		card_container.add_child(display.button)
+		card_container.add_child(display)
 
 # ============================================================================
 # INPUT HANDLING
